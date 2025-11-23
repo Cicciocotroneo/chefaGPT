@@ -3,18 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
     <title>RoboCook</title>
     <meta name="apple-mobile-web-app-title" content="RoboCook">
-    <meta name="application-name" content="RoboCook">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
     <meta name="theme-color" content="#2c3e50">
-
+    
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%232c3e50%22 rx=%2220%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-size=%2270%22>🤖</text></svg>">
 
@@ -31,112 +26,68 @@
             --tab-inactive: #ecf0f1;
         }
         
-        /* Evita il "bumping" elastico su iOS */
         html { height: 100%; overscroll-behavior: none; }
+        body { font-family: 'Lato', sans-serif; background: var(--bg-color); padding: 20px; color: #333; max-width: 850px; margin: 0 auto; padding-bottom: env(safe-area-inset-bottom); }
         
-        body { 
-            font-family: 'Lato', sans-serif; 
-            background: var(--bg-color); 
-            padding: 20px; 
-            color: #333; 
-            max-width: 850px; 
-            margin: 0 auto; 
-            line-height: 1.6;
-            /* Padding extra in basso per iPhone senza tasto home */
-            padding-bottom: env(safe-area-inset-bottom); 
-        }
-        
-        /* --- INTERFACCIA --- */
         .container { background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
-        h1 { color: var(--brand-color); text-align: center; margin-top: 0; font-family: 'Playfair Display', serif; letter-spacing: 1px; font-size: 2.5em; }
-        .subtitle { text-align: center; color: #7f8c8d; font-size: 1em; margin-top: -15px; margin-bottom: 30px; font-style: italic; }
+        h1 { color: var(--brand-color); text-align: center; margin-top: 0; font-family: 'Playfair Display', serif; font-size: 2.5em; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #7f8c8d; font-size: 1em; margin-bottom: 30px; font-style: italic; }
 
         .section { margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid #eee; }
-        .legal-footer { font-size: 0.7em; color: #bdc3c7; text-align: center; margin-top: 40px; line-height: 1.4; }
+        .legal-footer { font-size: 0.7em; color: #bdc3c7; text-align: center; margin-top: 40px; }
 
-        /* INPUT */
         label { font-weight: bold; display: block; margin-bottom: 8px; color: #2c3e50; }
-        input[type="text"], input[type="password"], textarea { width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 8px; font-family: inherit; -webkit-appearance: none; /* Rimuove stile iOS default */ }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 8px; font-family: inherit; -webkit-appearance: none; box-sizing: border-box; }
         
-        /* TABS */
         .tab-group { display: flex; gap: 10px; margin-bottom: 10px; }
-        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: #7f8c8d; background: var(--tab-inactive); transition: 0.2s; -webkit-tap-highlight-color: transparent; }
-        .tab-btn.active { background: var(--tab-active); color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: #7f8c8d; background: var(--tab-inactive); transition: 0.2s; }
+        .tab-btn.active { background: var(--tab-active); color: white; }
         .input-panel { display: none; }
         .input-panel.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* BOTTONI */
-        button.main-btn { width: 100%; padding: 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 15px; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; -webkit-tap-highlight-color: transparent; }
-        
-        .btn-primary { background: var(--accent-color); color: white; box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3); }
-        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn-primary:disabled { background: #bdc3c7; cursor: not-allowed; box-shadow: none; transform: none; }
-        
+        button.main-btn { width: 100%; padding: 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: var(--accent-color); color: white; }
+        .btn-primary:disabled { background: #bdc3c7; cursor: not-allowed; }
         .btn-check { background: var(--brand-color); color: white; width: 100%; padding: 10px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; margin-top:10px; }
-        .btn-print { background: #2c3e50; color: white; margin-top: 30px; }
         
         .btn-help { background: #ecf0f1; color: var(--brand-color); border: none; padding: 4px 10px; font-size: 0.8em; margin-left: 10px; cursor: pointer; border-radius: 4px; }
         .btn-remove { background: transparent; color: #95a5a6; border: 1px solid #ecf0f1; padding: 8px; font-size: 12px; margin-top: 5px; cursor: pointer; border-radius: 4px; }
 
-        /* MODALE & STATUS */
-        .status-box { padding: 15px; border-radius: 8px; font-size: 0.95em; margin-top: 15px; display: none; }
+        .status-box { padding: 15px; border-radius: 8px; font-size: 0.95em; margin-top: 15px; display: none; line-height: 1.4; }
         .status-error { background: var(--error-red); color: white; }
         .status-success { background: var(--success-green); color: white; }
+        
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(3px); }
-        .modal-content { background-color: #fff; margin: 10% auto; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .modal-content { background-color: #fff; margin: 10% auto; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; }
         .close-modal { float: right; font-size: 28px; cursor: pointer; color: #999; }
 
-        /* --- SCHEDA RICETTA --- */
-        #recipeCard { display: none; margin-top: 40px; border: 1px solid #ecf0f1; padding: 40px; border-radius: 12px; background: #fff; position: relative; }
+        #recipeCard { display: none; margin-top: 40px; border: 1px solid #ecf0f1; padding: 30px; border-radius: 12px; background: #fff; position: relative; }
         #recipeCard::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 8px; background: linear-gradient(to right, var(--brand-color), var(--accent-color)); border-radius: 12px 12px 0 0; }
         
         .recipe-header { border-bottom: 2px dashed #ecf0f1; margin-bottom: 25px; padding-bottom: 15px; }
         .recipe-title { font-family: 'Playfair Display', serif; font-size: 2.2em; color: var(--brand-color); margin: 0 0 10px 0; font-weight: 700; }
         .recipe-meta { font-size: 0.9em; color: #7f8c8d; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
 
-        .step { margin-bottom: 30px; background: #fff; }
+        .step { margin-bottom: 30px; }
         .step-web-container { border-left: 4px solid var(--accent-color); padding-left: 20px; }
         .step-action-title { font-weight: bold; color: var(--accent-color); text-transform: uppercase; font-size: 0.85em; letter-spacing: 1.5px; display: block; margin-bottom: 8px; }
         .step-desc { font-size: 1.1em; color: #34495e; }
         .tm6-tag { display: inline-block; background: #f8f9fa; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; font-weight: bold; margin-top: 10px; color: #7f8c8d; border: 1px solid #ecf0f1; font-family: 'Roboto Mono', monospace; }
 
-        /* --- STAMPA PDF --- */
         @media print {
-            body { background: white; padding: 0; margin: 0; color: #000; }
-            .container { box-shadow: none; padding: 0; border: none; width: 100%; max-width: 100%; }
+            body { background: white; padding: 0; margin: 0; }
             .no-print, .section, .tab-group, .input-panel, h1, .subtitle, button, .status-box, .modal, .legal-footer { display: none !important; }
-            
             #recipeCard { display: block !important; border: none; padding: 0; margin: 0; }
             #recipeCard::before { display: none; }
-
-            .recipe-header { text-align: center; border-bottom: 3px double #2c3e50; margin-bottom: 30px; padding-bottom: 20px; }
-            .recipe-title { font-size: 28pt; color: #000; margin-bottom: 10px; }
-            
+            .recipe-header { text-align: center; border-bottom: 3px double #2c3e50; }
+            .recipe-title { font-size: 24pt; color: #000; }
+            .step { page-break-inside: avoid; margin-bottom: 20px; display: flex; }
+            .step::before { content: counter(step-counter); counter-increment: step-counter; background: #2c3e50; color: white; width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold; font-size: 12pt; }
             #stepsContainer { counter-reset: step-counter; }
-
-            .step { page-break-inside: avoid; margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid #eee; display: flex; align-items: flex-start; }
-            .step-web-container { border-left: none; padding-left: 0; width: 100%; }
-
-            .step::before {
-                counter-increment: step-counter;
-                content: counter(step-counter);
-                background-color: #2c3e50;
-                color: white;
-                font-weight: bold;
-                font-size: 12pt;
-                width: 30px; height: 30px;
-                border-radius: 50%;
-                display: flex; align-items: center; justify-content: center;
-                margin-right: 20px; flex-shrink: 0;
-                -webkit-print-color-adjust: exact; print-color-adjust: exact;
-            }
-
-            .step-action-title { color: #2c3e50; font-size: 11pt; margin-bottom: 5px; }
-            .step-desc { font-size: 12pt; color: #000; text-align: justify; margin-bottom: 8px; }
-            .tm6-tag { display: block; width: fit-content; background-color: white !important; border: 1px solid #000; color: #000; font-size: 9pt; padding: 4px 10px; margin-top: 5px; border-radius: 4px; font-family: monospace; }
-
-            #printFooter { display: block !important; margin-top: 50px; font-size: 8pt; color: #999; text-align: center; border-top: 1px solid #eee; padding-top: 10px; font-family: sans-serif; }
+            .step-web-container { border: none; padding: 0; }
+            .tm6-tag { border: 1px solid #000; color: #000; background: white !important; }
+            #printFooter { display: block !important; margin-top: 50px; font-size: 8pt; text-align: center; color: #999; }
         }
         #printFooter { display: none; }
     </style>
@@ -171,12 +122,14 @@
             </div>
 
             <div id="panel-url" class="input-panel">
-                <input type="text" id="urlInput" placeholder="https://www.esempio-ricette.it/..." />
-                <p style="font-size:0.85em; color:#95a5a6; margin-top:8px;">Compatibile con la maggior parte dei siti di cucina.</p>
+                <input type="text" id="urlInput" placeholder="https://www.giallozafferano.it/..." />
+                <p style="font-size:0.85em; color:#95a5a6; margin-top:8px;">
+                    <strong>Nota:</strong> Alcuni siti (come GialloZafferano) bloccano l'accesso automatico. Se vedi un errore, usa il tasto "Incolla Testo" e copia manualmente la ricetta.
+                </p>
             </div>
 
             <div id="panel-text" class="input-panel active">
-                <textarea id="recipeInput" style="height:150px" placeholder="Incolla qui la ricetta..."></textarea>
+                <textarea id="recipeInput" style="height:150px" placeholder="Incolla qui il testo della ricetta..."></textarea>
             </div>
             
             <button id="convertBtn" class="main-btn btn-primary" onclick="processRecipe()" disabled>
@@ -198,8 +151,7 @@
         </button>
 
         <div class="legal-footer no-print">
-            RoboCook ChefGPT è un software sperimentale di elaborazione testi.<br>
-            Non affiliato a Vorwerk®, Thermomix® o Bimby®.
+            RoboCook ChefGPT è un software sperimentale. Non affiliato a Vorwerk® o GialloZafferano.
         </div>
     </div>
 
@@ -208,15 +160,14 @@
             <span class="close-modal" onclick="toggleModal(false)">&times;</span>
             <h2 style="color:var(--brand-color)">API Key Google</h2>
             <ol style="padding-left:20px; line-height:1.6;">
-                <li>Vai su <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent-color)">Google AI Studio</a></li>
-                <li>Crea una chiave gratuita ("Create API Key").</li>
+                <li>Vai su <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a></li>
+                <li>Crea chiave gratuita.</li>
                 <li>Incollala qui.</li>
             </ol>
         </div>
     </div>
 
     <script>
-        // --- LOGICA DI SCRAPING E AI ---
         let currentMode = 'text';
         function switchTab(mode) {
             currentMode = mode;
@@ -244,7 +195,7 @@
             }
         };
         function removeKey() {
-            if(confirm("Disconnettere la chiave?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); }
+            if(confirm("Disconnettere?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); }
         }
 
         async function findWorkingModel(auto=false) {
@@ -261,7 +212,7 @@
                 const d = await r.json();
                 if(d.error) throw new Error(d.error.message);
                 const mods = d.models.filter(m => m.supportedGenerationMethods?.includes("generateContent"));
-                if(mods.length===0) throw new Error("Nessun modello AI disponibile.");
+                if(mods.length===0) throw new Error("Nessun modello AI.");
                 mods.sort((a,b) => (b.name.includes('flash')?1:0)-(a.name.includes('flash')?1:0));
 
                 mb.innerHTML="";
@@ -274,7 +225,7 @@
                 localStorage.setItem(STORAGE_KEY, key);
                 document.getElementById('savedBadge').style.display='inline';
                 document.getElementById('removeBtn').style.display='inline-flex';
-                sb.className='status-box status-success'; sb.innerText="✅ Connesso a Google AI";
+                sb.className='status-box status-success'; sb.innerText="✅ Connesso";
                 document.getElementById('modelSelectionArea').style.display='block';
                 btn.disabled=false; btn.innerHTML="✨ <b>Genera Ricetta</b>";
 
@@ -283,24 +234,51 @@
             }
         }
 
-        async function fetchWebPage(url) {
-            try {
-                const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(url)}`;
-                const res = await fetch(proxyUrl);
-                if (!res.ok) throw new Error("Errore accesso sito.");
-                const htmlText = await res.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(htmlText, 'text/html');
-                
-                const scripts = doc.querySelectorAll('script[type="application/ld+json"]');
-                for(const s of scripts) {
-                    if(s.innerText.includes("Recipe")) return "DATI_JSON: " + s.innerText;
-                }
-                doc.querySelectorAll('script, style, nav, footer, header, iframe, .advertisement').forEach(e => e.remove());
-                return (doc.querySelector('main') || doc.body).innerText.substring(0, 30000);
-            } catch (e) {
-                throw new Error("Sito Protetto. Usa Copia/Incolla.");
+        // --- LOGICA MULTI-PROXY ---
+        async function fetchWithProxy(url, proxyService) {
+            let fetchUrl = '';
+            if (proxyService === 1) fetchUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+            if (proxyService === 2) fetchUrl = `https://corsproxy.io/?url=${encodeURIComponent(url)}`;
+            if (proxyService === 3) fetchUrl = `https://thingproxy.freeboard.io/fetch/${url}`;
+
+            console.log(`Tentativo Proxy ${proxyService}...`);
+            
+            const res = await fetch(fetchUrl);
+            if (!res.ok) throw new Error(`Proxy ${proxyService} fallito`);
+            
+            if (proxyService === 1) {
+                const data = await res.json();
+                return data.contents;
+            } else {
+                return await res.text();
             }
+        }
+
+        async function fetchWebPage(url) {
+            let htmlText = "";
+            
+            // Tenta 3 proxy in sequenza
+            try { htmlText = await fetchWithProxy(url, 2); } 
+            catch (e) { 
+                try { htmlText = await fetchWithProxy(url, 1); }
+                catch (e2) {
+                    try { htmlText = await fetchWithProxy(url, 3); }
+                    catch (e3) { throw new Error("Tutti i tentativi di connessione sono falliti. Il sito è protetto."); }
+                }
+            }
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlText, 'text/html');
+            
+            // Cerca JSON-LD (Metodo più affidabile)
+            const scripts = doc.querySelectorAll('script[type="application/ld+json"]');
+            for(const s of scripts) {
+                if(s.innerText.includes("Recipe")) return "DATI_JSON_LD: " + s.innerText;
+            }
+            
+            // Fallback testo grezzo
+            doc.querySelectorAll('script, style, nav, footer, header, iframe, .advertisement').forEach(e => e.remove());
+            return (doc.querySelector('main') || doc.body).innerText.substring(0, 30000);
         }
 
         async function processRecipe() {
@@ -319,7 +297,7 @@
                 if(currentMode === 'url') {
                     const url = document.getElementById('urlInput').value;
                     if(!url) throw new Error("URL mancante");
-                    out.innerHTML = '<div style="text-align:center; padding:30px;">🌐 Importazione...</div>';
+                    out.innerHTML = '<div style="text-align:center; padding:30px;">🌐 Importazione (Tentativo Multi-Proxy)...</div>';
                     textData = await fetchWebPage(url);
                 } else {
                     textData = document.getElementById('recipeInput').value;
@@ -366,7 +344,15 @@
                 pBtn.style.display='block';
 
             } catch(e) {
-                out.innerHTML = `<div class="status-box status-error">Errore: ${e.message}</div>`;
+                out.innerHTML = `<div class="status-box status-error">
+                    <b>Errore Importazione:</b> ${e.message}<br><br>
+                    ⚠️ <b>Il sito ha bloccato l'accesso automatico.</b><br>
+                    Niente paura! Fai così:<br>
+                    1. Vai sulla pagina della ricetta.<br>
+                    2. Seleziona tutto il testo e copialo.<br>
+                    3. Torna qui, clicca su <b>"Incolla Testo"</b> e incolla.<br>
+                    L'IA funzionerà comunque perfettamente!
+                </div>`;
             }
         }
     </script>
