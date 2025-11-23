@@ -103,18 +103,6 @@
         /* CONTENITORE NASCOSTO PER STAMPA MULTIPLA */
         #multiPrintArea { display: none; }
 
-        /* --- LEGAL FOOTER STYLES --- */
-        .legal-footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            color: #999;
-            font-size: 0.75rem;
-            text-align: justify;
-            line-height: 1.4;
-        }
-        .legal-footer strong { color: #777; }
-
         /* --- CSS SPECIFICO PER LA STAMPA (PDF) --- */
         @media print {
             body { background: white; padding: 0; margin: 0; color: #000; }
@@ -132,7 +120,6 @@
                 padding: 0; 
                 margin: 0;
                 page-break-after: always; /* Importante per la stampa multipla */
-                position: relative;
             }
             .recipe-print-wrapper:last-child { page-break-after: auto; }
 
@@ -204,31 +191,31 @@
                 border-radius: 4px;
             }
 
-            /* Footer Legale in Stampa */
-            .legal-footer {
-                display: block !important;
-                margin-top: 50px;
-                font-size: 7pt;
-                color: #666;
-                text-align: center;
-                border-top: 1px solid #ccc;
+            #printFooter, .print-footer-multi { 
+                display: block !important; 
+                margin-top: 50px; 
+                font-size: 8pt; 
+                color: #999; 
+                text-align: center; 
+                border-top: 1px solid #eee; 
                 padding-top: 10px;
-                page-break-inside: avoid;
+                font-family: sans-serif;
             }
         }
+        #printFooter { display: none; }
     </style>
 <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="antonioder3" data-description="Support me on Buy me a coffee!" data-message="" data-color="#40DCA5" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
 </head>
 <body>
 
     <div class="container">
-        <h1 class="no-print">🍳 RoboCook <span style="font-size:0.4em; vertical-align:middle; background:#2c423b; padding:3px 8px; border-radius:10px; color:white;">v9.2 ChefGPT</span></h1>
+        <h1 class="no-print">🍳 RoboCook <span style="font-size:0.4em; vertical-align:middle; background:#2c423b; padding:3px 8px; border-radius:10px; color:white;">v9.1 ChefGPT</span></h1>
 
         <div class="section no-print">
             <label>
                 1. Google API Key 
                 <button class="btn-help" onclick="toggleModal(true)">❓ Istruzioni</button>
-                <span id="savedBadge" style="display:none; color:green; font-size:0.8em; margin-left:10px;">(Salvata nel PC ✅)</span>
+                <span id="savedBadge" style="display:none; color:green; font-size:0.8em; margin-left:10px;">(Salvata ✅)</span>
             </label>
             <input type="password" id="apiKey" placeholder="Incolla qui la tua chiave (AIza...)" />
             <button class="btn-check" onclick="findWorkingModel()">🔄 Connetti</button>
@@ -269,12 +256,7 @@
                 <span id="resServings" class="recipe-meta">...</span>
             </div>
             <div id="stepsContainer"></div>
-            
-            <div class="legal-footer">
-                <strong>DISCLAIMER & NOTE LEGALI:</strong> Questo strumento è sviluppato esclusivamente a fini didattici, di studio e dimostrativi. L'autore del software non si assume alcuna responsabilità civile o penale per la riuscita delle ricette, eventuali danni a cose, persone o malfunzionamenti dell'elettrodomestico derivanti dall'uso delle istruzioni generate. 
-                <br><br>
-                L'utente è l'unico responsabile della verifica della correttezza di temperature, velocità e tempi prima di avviare l'apparecchio, nel rispetto delle norme di sicurezza del produttore. Il sito non è affiliato, sponsorizzato o approvato dai produttori degli apparecchi da cucina citati. Marchi, loghi e contenuti coperti da copyright appartengono ai rispettivi legittimi proprietari; l'autore è a completa disposizione degli aventi diritto per la rimozione immediata di eventuali contenuti o riferimenti ritenuti lesivi.
-            </div>
+            <div id="printFooter">Ricetta generata e ottimizzata per Robot da Cucina da AI Converter.</div>
         </div>
 
         <div class="action-group no-print" id="actionButtons" style="display:none;">
@@ -294,10 +276,6 @@
                 </button>
             </div>
             <div id="savedList"></div>
-        </div>
-        
-        <div class="legal-footer no-print">
-            <strong>NOTE LEGALI:</strong> Sito a scopo didattico. L'autore declina ogni responsabilità sull'esecuzione delle ricette. Verificare sempre le impostazioni di sicurezza. Eventuali marchi registrati appartengono ai legittimi proprietari. <span style="cursor:pointer; text-decoration:underline;" onclick="alert('Per rimozione contenuti o segnalazioni copyright, contattare l\'amministratore del repository o del sito ospitante.')">Segnala Copyright</span>.
         </div>
 
         <div id="multiPrintArea"></div>
@@ -454,7 +432,6 @@
                    - Cibi Delicati (non tritare): Indica ESPLICITAMENTE di usare il "Coprilame" solo in fasi che non prevedano triturazione,frullatura o taglio. L'accessorio comunque consiste in un pezzo di metallo circolare che divide in due in orizzontale il boccale coprendo la metà bassa contenente le lame. Non devi mai prevederne l'uso se, anche in una fase successiva, tutto va frullato e amalgamato, quindi inseriscilo Solo quando la parte cotta con il coprilame debba comunque dopo essere rimossa per poi ricomparire nella fase di impiattamento.
                    - Cottura a Vapore: Se possibile, usa il "Varoma" o setta Temp. Vapore.
                 
-                
                 OUTPUT JSON:
                 { "title": "...", "servings": "...", "steps": [ {"action":"...", "desc":"...", "settings":"..."} ] }
                 `;
@@ -496,7 +473,7 @@
             }
         }
 
-        // --- SALVATAGGIO E STAMPA MULTIPLA ---
+        // --- NUOVE FUNZIONALITÀ DI SALVATAGGIO E STAMPA MULTIPLA ---
 
         function getSavedRecipes() {
             const stored = localStorage.getItem(RECIPE_STORAGE_KEY);
@@ -582,13 +559,6 @@
             // Aggiungi classe al body per nascondere la card singola in CSS print
             document.body.classList.add('printing-multi');
 
-            // Testo Disclaimer da inserire in fondo ad ogni ricetta stampata
-            const disclaimerText = `
-                <div class="legal-footer">
-                    <strong>DISCLAIMER:</strong> Scopo didattico. L'autore declina responsabilità su danni o malfunzionamenti. 
-                    Verificare impostazioni di sicurezza. Marchi dei rispettivi proprietari.
-                </div>`;
-
             checkboxes.forEach(cb => {
                 const id = parseInt(cb.value);
                 const recipe = recipes.find(r => r.id === id);
@@ -616,7 +586,8 @@
                         <div class="steps-print-container">
                             ${stepsHtml}
                         </div>
-                        ${disclaimerText} </div>
+                        <div class="print-footer-multi">Generato con RoboCook</div>
+                    </div>
                     `;
                     printArea.innerHTML += recipeHtml;
                 }
@@ -624,6 +595,8 @@
 
             window.print();
 
+            // Pulizia dopo la stampa (rimuovi classe per tornare normali)
+            // Nota: window.print() è bloccante su molti browser, quindi questo avviene dopo la chiusura del dialog
             setTimeout(() => {
                 document.body.classList.remove('printing-multi');
                 printArea.innerHTML = ""; 
