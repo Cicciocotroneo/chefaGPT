@@ -96,7 +96,7 @@
 
     <div class="container">
         <h1 class="no-print">🤖 RoboCook <span style="color:var(--accent-color)">ChefGPT</span></h1>
-        <div class="subtitle no-print">Il tuo assistente di cucina AI</div>
+        <div class="subtitle no-print">v13.0 (GZ Fix)</div>
 
         <div class="section no-print">
             <label>
@@ -124,7 +124,7 @@
             <div id="panel-url" class="input-panel">
                 <input type="text" id="urlInput" placeholder="https://www.giallozafferano.it/..." />
                 <p style="font-size:0.85em; color:#95a5a6; margin-top:8px;">
-                    <strong>Nota:</strong> Alcuni siti (come GialloZafferano) bloccano l'accesso automatico. Se vedi un errore, usa il tasto "Incolla Testo" e copia manualmente la ricetta.
+                    <strong>Aggiornamento v13:</strong> Usa il nuovo motore <em>Smart Reader</em> per aggirare i blocchi dei siti di ricette.
                 </p>
             </div>
 
@@ -151,7 +151,7 @@
         </button>
 
         <div class="legal-footer no-print">
-            RoboCook ChefGPT è un software sperimentale. Non affiliato a Vorwerk® o GialloZafferano.
+            RoboCook ChefGPT è un software sperimentale. Non affiliato a Vorwerk® o siti terzi.
         </div>
     </div>
 
@@ -234,51 +234,32 @@
             }
         }
 
-        // --- LOGICA MULTI-PROXY ---
-        async function fetchWithProxy(url, proxyService) {
-            let fetchUrl = '';
-            if (proxyService === 1) fetchUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-            if (proxyService === 2) fetchUrl = `https://corsproxy.io/?url=${encodeURIComponent(url)}`;
-            if (proxyService === 3) fetchUrl = `https://thingproxy.freeboard.io/fetch/${url}`;
-
-            console.log(`Tentativo Proxy ${proxyService}...`);
-            
-            const res = await fetch(fetchUrl);
-            if (!res.ok) throw new Error(`Proxy ${proxyService} fallito`);
-            
-            if (proxyService === 1) {
-                const data = await res.json();
-                return data.contents;
-            } else {
-                return await res.text();
-            }
-        }
-
+        // --- NUOVO MOTORE JINA READER (V13) ---
         async function fetchWebPage(url) {
-            let htmlText = "";
+            // Usa Jina Reader come proxy intelligente (restituisce Markdown pulito)
+            // Questo bypassa i blocchi JS/Cookie di GialloZafferano
+            const readerUrl = `https://r.jina.ai/${url}`;
             
-            // Tenta 3 proxy in sequenza
-            try { htmlText = await fetchWithProxy(url, 2); } 
-            catch (e) { 
-                try { htmlText = await fetchWithProxy(url, 1); }
-                catch (e2) {
-                    try { htmlText = await fetchWithProxy(url, 3); }
-                    catch (e3) { throw new Error("Tutti i tentativi di connessione sono falliti. Il sito è protetto."); }
-                }
+            // Se Jina fallisce direttamente dal browser (CORS), usiamo un proxy sopra Jina
+            // Ma r.jina.ai di solito supporta CORS per i client web.
+            
+            try {
+                const res = await fetch(readerUrl);
+                if (!res.ok) throw new Error("Jina Reader occupato");
+                const text = await res.text();
+                
+                // Se il testo è troppo breve o sembra un errore, falliamo
+                if(text.length < 100 || text.includes("Access denied")) throw new Error("Blocco rilevato");
+                
+                return "FORMATO_MARKDOWN_JINA:\n" + text;
+            } catch (e) {
+                // Fallback estremo: Proxy classico su Jina
+                console.log("Fallback su Proxy...", e);
+                const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(readerUrl)}`;
+                const res2 = await fetch(proxyUrl);
+                if(!res2.ok) throw new Error("Impossibile leggere il sito.");
+                return "FORMATO_MARKDOWN_PROXY:\n" + await res2.text();
             }
-
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlText, 'text/html');
-            
-            // Cerca JSON-LD (Metodo più affidabile)
-            const scripts = doc.querySelectorAll('script[type="application/ld+json"]');
-            for(const s of scripts) {
-                if(s.innerText.includes("Recipe")) return "DATI_JSON_LD: " + s.innerText;
-            }
-            
-            // Fallback testo grezzo
-            doc.querySelectorAll('script, style, nav, footer, header, iframe, .advertisement').forEach(e => e.remove());
-            return (doc.querySelector('main') || doc.body).innerText.substring(0, 30000);
         }
 
         async function processRecipe() {
@@ -288,7 +269,7 @@
             const card = document.getElementById('recipeCard');
             const pBtn = document.getElementById('printBtn');
 
-            out.innerHTML = '<div style="text-align:center; padding:30px; color:#7f8c8d;">⏳ <b>RoboCook sta elaborando...</b></div>';
+            out.innerHTML = '<div style="text-align:center; padding:30px; color:#7f8c8d;">⏳ <b>RoboCook sta leggendo il sito...</b></div>';
             card.style.display='block'; pBtn.style.display='none';
             card.scrollIntoView({behavior:'smooth'});
 
@@ -297,7 +278,7 @@
                 if(currentMode === 'url') {
                     const url = document.getElementById('urlInput').value;
                     if(!url) throw new Error("URL mancante");
-                    out.innerHTML = '<div style="text-align:center; padding:30px;">🌐 Importazione (Tentativo Multi-Proxy)...</div>';
+                    out.innerHTML = '<div style="text-align:center; padding:30px;">🌐 Aggiramento protezioni in corso...</div>';
                     textData = await fetchWebPage(url);
                 } else {
                     textData = document.getElementById('recipeInput').value;
@@ -308,11 +289,14 @@
 
                 const PROMPT = `
                 Agisci come RoboCook, assistente esperto di robot da cucina (tipo TM6).
+                Analizza il testo fornito (può essere Markdown sporco o testo grezzo).
+                
                 Compito:
                 1. Estrai Titolo e Porzioni.
                 2. Converti la ricetta passo passo.
                 3. INSERISCI LE QUANTITÀ nel testo di ogni passo.
                 4. Genera settings: Trito (Vel 5-8), Soffritto (120°C), Cottura (100°C Antiorario), Vapore (Varoma).
+                
                 OUTPUT JSON: { "title": "...", "servings": "...", "steps": [ {"action":"...", "desc":"...", "tm6":"..."} ] }
                 `;
 
@@ -346,12 +330,11 @@
             } catch(e) {
                 out.innerHTML = `<div class="status-box status-error">
                     <b>Errore Importazione:</b> ${e.message}<br><br>
-                    ⚠️ <b>Il sito ha bloccato l'accesso automatico.</b><br>
-                    Niente paura! Fai così:<br>
+                    ⚠️ <b>Sito ultra-protetto.</b><br>
+                    Usa il metodo manuale:<br>
                     1. Vai sulla pagina della ricetta.<br>
                     2. Seleziona tutto il testo e copialo.<br>
                     3. Torna qui, clicca su <b>"Incolla Testo"</b> e incolla.<br>
-                    L'IA funzionerà comunque perfettamente!
                 </div>`;
             }
         }
