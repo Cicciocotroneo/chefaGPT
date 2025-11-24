@@ -206,6 +206,11 @@
 
         <div id="savedRecipesContainer" class="no-print" style="display:none;">
             <h2 style="margin:0 0 15px 0; font-size:1.5em; color:var(--robo-green);">📚 Il Mio Ricettario</h2>
+            <div class="no-print">
+                <button class="btn-help" onclick="exportRecipes()" style="font-size:14px; padding:5px 10px;">⬇️ Export</button>
+                <button class="btn-help" onclick="document.getElementById('importFile').click()" style="font-size:14px; padding:5px 10px;">⬆️ Import</button>
+                <input type="file" id="importFile" style="display:none" onchange="importRecipes(this)" accept=".json">
+            </div>
             <div id="savedList"></div>
         </div>
 
@@ -546,6 +551,49 @@
                 `;
                 list.appendChild(div);
             });
+        }
+
+        function exportRecipes() {
+            const data = localStorage.getItem(RECIPE_STORAGE_KEY);
+            if (!data || data === '[]') return alert("Il ricettario è vuoto.");
+            
+            const blob = new Blob([data], {type: 'application/json'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'robocook_backup_' + new Date().toISOString().slice(0,10) + '.json';
+            a.click();
+        }
+
+        function importRecipes(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (!Array.isArray(imported)) throw new Error("Formato file non valido");
+                    
+                    if(confirm(`Trovate ${imported.length} ricette. Vuoi AGGIUNGERLE al ricettario esistente?\n(Premi OK per aggiungere, Annulla per sostituire tutto)`)) {
+                        const current = getSavedRecipes();
+                        const merged = [...imported, ...current];
+                        // Rimuove eventuali duplicati basati sull'ID
+                        const unique = merged.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i);
+                        localStorage.setItem(RECIPE_STORAGE_KEY, JSON.stringify(unique));
+                    } else {
+                        // Sostituzione totale
+                        if(confirm("Sei sicuro? Questo cancellerà le ricette attuali!")) {
+                            localStorage.setItem(RECIPE_STORAGE_KEY, JSON.stringify(imported));
+                        } else { return; }
+                    }
+                    loadSavedRecipes();
+                    alert("Importazione completata! ✅");
+                } catch(err) {
+                    alert("❌ Errore durante l'importazione: " + err.message);
+                }
+            };
+            reader.readAsText(file);
+            input.value = ''; // Resetta input per permettere di ricaricare lo stesso file
         }
     </script>
 </body>
