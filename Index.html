@@ -206,11 +206,13 @@
 
         <div id="savedRecipesContainer" class="no-print" style="display:none;">
             <h2 style="margin:0 0 15px 0; font-size:1.5em; color:var(--robo-green);">📚 Il Mio Ricettario</h2>
+        </br>
             <div class="no-print">
                 <button class="btn-help" onclick="exportRecipes()" style="font-size:14px; padding:5px 10px;">⬇️ Export</button>
                 <button class="btn-help" onclick="document.getElementById('importFile').click()" style="font-size:14px; padding:5px 10px;">⬆️ Import</button>
                 <input type="file" id="importFile" style="display:none" onchange="importRecipes(this)" accept=".json">
             </div>
+        </br>
             <div id="savedList"></div>
         </div>
 
